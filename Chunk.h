@@ -12,14 +12,17 @@ struct Out
 class Chunk
 {
 	public:
+		static const unsigned char TEXTURE_ATLAS_WIDTH = 2;
 		static const unsigned char CHUNK_WIDTH = 32;
 		static const unsigned char CHUNK_HEIGHT = 16;
+		static const bool DRAW_ALL_FACES = false;
 
 		int blocks[CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT];
 		Chunk(int x, int y);
 		Out GenerateVertices();
 
 		static const int COORD_INDEX(int localX, int localY, int localZ);
+		bool isABlock(int x, int y, int z);
 };
 
 #endif

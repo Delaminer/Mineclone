@@ -123,20 +123,10 @@ float map(float x, float in_min, float in_max, float out_min, float out_max) {
 
 glm::vec2 uv(glm::vec2 inUV, int x, int y)
 {
-	const int texWidth = 2;
-	y = texWidth - y - 1;
+	y = Chunk::TEXTURE_ATLAS_WIDTH - y - 1;
 
-	//Input goes from 0 to 1
-	//Ouput needs to go from a small section of that
-	//float ux = map(inUV.x, 0.0f, 1.0f, (float)(1.0f * x / texWidth), (float)((1.0f * x + 1.0f) / texWidth));
-	//std::cout << "ux is " << ux << std::endl;
-	//float uy = map(inUV.y, 0.0f, 1.0f, (float)(1.0f * y / texWidth), (float)((1.0f * y + 1.0f) / texWidth));
-
-	float ux = (x + inUV.x) / texWidth;
-	float uy = (y + inUV.y) / texWidth;
-
-	//float ux = inUV.x / 2.0f;
-	//float uy = inUV.y / 2.0f;
+	float ux = (x + inUV.x) / Chunk::TEXTURE_ATLAS_WIDTH;
+	float uy = (y + inUV.y) / Chunk::TEXTURE_ATLAS_WIDTH;
 
 	return glm::vec2(ux, uy);
 }
@@ -145,7 +135,6 @@ glm::vec2 uv(glm::vec2 inUV, int x, int y)
 glm::vec2 uv(glm::vec2 inUV, int id)
 {
 	//How many textures there are 
-	const int texWidth = 2;
 	int x, y;
 	switch (id)
 	{
@@ -196,9 +185,6 @@ void getTextureCoords(int id, int* coords)
 			coords[i + 1] = 1;
 		}
 		break;
-	//case 3:
-	//	x = 1;
-	//	y = 1;
 	default: //stone
 		for (int i = 0; i < 12; i += 2)
 		{
@@ -210,9 +196,9 @@ void getTextureCoords(int id, int* coords)
 
 void generateUvSet(int id, glm::vec2* uvSet, glm::vec2* reference)
 {
-	//Make 24 UV coordinates boiiiiiiii
+	//Make 24 UV coordinates
 	int coordinates[12];
-	getTextureCoords(id, coordinates);
+	getTextureCoords(id, coordinates); //Use ID to get coordinates of each block face in texture atlas
 
 	//Use texture coordinates to form texture UVs
 	for (int i = 0; i < 12; i += 2)
@@ -228,40 +214,6 @@ void generateUvSet(int id, glm::vec2* uvSet, glm::vec2* reference)
 
 Out Chunk::GenerateVertices()
 {
-	VE refereanceVertex[24] = {
-
-		//Top
-		VE{glm::vec3(-1.0f, 1.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(1.0f, 1.0f, -1.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(1.0f, 1.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
-		//Front
-		VE{glm::vec3(1.0f, -1.0f,  -1.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(1.0f, 1.0f, -1.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(-1.0f, -1.0f,  -1.0f), glm::vec2(1.0f, 0.0f)},
-		//Back
-		VE{glm::vec3(-1.0f, -1.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(1.0f, -1.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
-		//Left
-		VE{glm::vec3(-1.0f, -1.0f,  -1.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(-1.0f, 1.0f, -1.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(-1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(-1.0f, -1.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
-		//Right
-		VE{glm::vec3(1.0f, -1.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(1.0f, 1.0f, -1.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(1.0f, -1.0f,  -1.0f), glm::vec2(1.0f, 0.0f)},
-
-		//Bottom
-		VE{glm::vec3(1.0f, -1.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(1.0f, -1.0f, -1.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(-1.0f, -1.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
-	};
 	VE referenceVertex[24] = {
 
 		//Top
@@ -352,9 +304,65 @@ Out Chunk::GenerateVertices()
 						
 					}
 					int offset = tempV.size() - 24;
-					for (int i = 0; i < 36; i++)
+					if (DRAW_ALL_FACES)
 					{
-						tempI.push_back(referenceIndex[i] + offset);
+						//Draw all faces
+						for (int i = 0; i < 36; i++)
+						{
+							tempI.push_back(referenceIndex[i] + offset);
+						}
+					}
+					else
+					{
+						//Only draw faces that are visible
+						if (y == CHUNK_HEIGHT - 1 || !isABlock(x, y + 1, z))
+						{
+							//Draw top
+							for (int i = 0; i < 6; i++)
+							{
+								tempI.push_back(referenceIndex[i] + offset);
+							}
+						}
+						if (z == 0 || !isABlock(x, y, z - 1))
+						{
+							//Draw front
+							for (int i = 6; i < 12; i++)
+							{
+								tempI.push_back(referenceIndex[i] + offset);
+							}
+						}
+						if (z == CHUNK_WIDTH - 1 || !isABlock(x, y, z + 1))
+						{
+							//Draw back
+							for (int i = 12; i < 18; i++)
+							{
+								tempI.push_back(referenceIndex[i] + offset);
+							}
+						}
+						if (x == 0 || !isABlock(x - 1, y, z))
+						{
+							//Draw left
+							for (int i = 18; i < 24; i++)
+							{
+								tempI.push_back(referenceIndex[i] + offset);
+							}
+						}
+						if (x == CHUNK_WIDTH - 1 || !isABlock(x + 1, y, z))
+						{
+							//Draw right
+							for (int i = 24; i < 30; i++)
+							{
+								tempI.push_back(referenceIndex[i] + offset);
+							}
+						}
+						if (y == 0 || !isABlock(x, y - 1, z))
+						{
+							//Draw bottom
+							for (int i = 30; i < 36; i++)
+							{
+								tempI.push_back(referenceIndex[i] + offset);
+							}
+						}
 					}
 				}
 			}
@@ -366,4 +374,8 @@ Out Chunk::GenerateVertices()
 const int Chunk::COORD_INDEX(int localX, int localY, int localZ)
 {
 	return ((localY * CHUNK_WIDTH) + localZ) * CHUNK_WIDTH + localX;
+}
+bool Chunk::isABlock(int x, int y, int z)
+{
+	return blocks[COORD_INDEX(x, y, z)] != 0;
 }

@@ -123,7 +123,7 @@ int main()
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 
-	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
+	Camera camera(width, height, glm::vec3(Chunk::CHUNK_WIDTH / 2, Chunk::CHUNK_HEIGHT, Chunk::CHUNK_WIDTH / 2));
 
 	//Timing stuff to display FPS
 	double prevTime = 0.0;
