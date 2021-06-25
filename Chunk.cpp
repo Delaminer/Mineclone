@@ -5,89 +5,15 @@
 #include"Perlin.h"
 
 
-void PerlinNoise1D(int count, float* seed, int octaves, float* output)
+
+
+Chunk::Chunk()
 {
-	for (int x = 0; x < count; x++)
-	{
-		float noise = 0.0f;
-		float scale = 1.0f;
-		float scaleAccumulate = 0.0f; //What the total scale is after all octaves
-		float scaleBias = 1.0f;
 
-		for (int octave = 0; octave < octaves; octave++)
-		{
-			int pitch = count >> octave; //Halve pitch for each octave
-			int sample1 = (x / pitch) * pitch; //Removes remainder
-			int sample2 = (sample1 + pitch) % count; //Other sample
-
-			float blend = (float)(x - sample1) / (float)pitch; //From 0 to 1
-			float sample = (1.0f - blend) * seed[sample1] + blend * seed[sample2];
-			noise += sample * scale;
-
-			scaleAccumulate += scale;
-			scale = scale / scaleBias; //Halve the scale each octave
-
-		}
-
-		output[x] = noise / scaleAccumulate;
-	}
 }
 
-void PerlinNoise2D(int width, int height, float* seed, int octaves, float* output)
+void Chunk::GenerateBlocks(int chunkX, int chunkZ)
 {
-	for (int x = 0; x < width; x++)
-	{
-		for (int y = 0; y < height; y++)
-		{
-			float noise = 0.0f;
-			float scale = 1.0f;
-			float scaleAccumulate = 0.0f; //What the total scale is after all octaves
-			float scaleBias = 1.75f;
-
-			for (int octave = 0; octave < octaves; octave++)
-			{
-				int pitch = width >> octave; //Halve pitch for each octave
-
-				int sampleX1 = (x / pitch) * pitch; //Removes remainder
-				int sampleY1 = (y / pitch) * pitch; //Removes remainder
-
-				int sampleX2 = (sampleX1 + pitch) % width; //Other sample
-				int sampleY2 = (sampleY1 + pitch) % width; //Other sample
-
-				float blendX = (float)(x - sampleX1) / (float)pitch; //From 0 to 1
-				float blendY = (float)(y - sampleY1) / (float)pitch; //From 0 to 1
-
-				float sampleT = (1.0f - blendX) * seed[sampleY1 * width + sampleX1] + blendX * seed[sampleY1 * width + sampleX2];
-				float sampleB = (1.0f - blendX) * seed[sampleY2 * width + sampleX1] + blendX * seed[sampleY2 * width + sampleX2];
-				
-				noise += (blendY * (sampleB - sampleT) + sampleT) * scale;
-
-				scaleAccumulate += scale;
-				scale = scale / scaleBias; //Halve the scale each octave
-
-			}
-
-			output[y * width + x] = noise / scaleAccumulate;
-		}
-	}
-}
-
-
-Chunk::Chunk(int chunkX, int chunkZ)
-{
-	/* Old Perlin Noise
-	float *noiseSeed = new float[CHUNK_WIDTH * CHUNK_WIDTH];
-	float *perlinNoise = new float[CHUNK_WIDTH * CHUNK_WIDTH];
-	//srand(time(NULL));
-	unsigned int seed = 1;
-	srand(chunkX + seed);
-	srand(chunkZ + rand());
-	for (int i = 0; i < CHUNK_WIDTH * CHUNK_WIDTH; i++) noiseSeed[i] = (float)rand() / (float)RAND_MAX;
-
-	int octaves = 4;
-	PerlinNoise2D(CHUNK_WIDTH, CHUNK_WIDTH, noiseSeed, octaves, perlinNoise);
-	*/
-
 	//Generate blocks
 	for (int x = 0; x < CHUNK_WIDTH; x++)
 	{
@@ -214,40 +140,40 @@ void generateUvSet(int id, glm::vec2* uvSet, glm::vec2* reference)
 	}
 }
 
-Out Chunk::GenerateVertices(int chunkX, int chunkZ)
+ChunkGraphics Chunk::GenerateVertices(int chunkX, int chunkZ)
 {
-	VE referenceVertex[24] = {
+	Vertex referenceVertex[24] = {
 
 		//Top
-		VE{glm::vec3(0.0f, 1.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(1.0f, 1.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
+		Vertex{glm::vec3(0.0f, 1.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
+		Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
+		Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+		Vertex{glm::vec3(1.0f, 1.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
 		//Front
-		VE{glm::vec3(1.0f, 0.0f,  0.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(0.0f, 0.0f,  0.0f), glm::vec2(1.0f, 0.0f)},
+		Vertex{glm::vec3(1.0f, 0.0f,  0.0f), glm::vec2(0.0f, 0.0f)},
+		Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
+		Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+		Vertex{glm::vec3(0.0f, 0.0f,  0.0f), glm::vec2(1.0f, 0.0f)},
 		//Back
-		VE{glm::vec3(0.0f, 0.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
+		Vertex{glm::vec3(0.0f, 0.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
+		Vertex{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+		Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+		Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
 		//Left
-		VE{glm::vec3(0.0f, 0.0f,  0.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(0.0f, 0.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
+		Vertex{glm::vec3(0.0f, 0.0f,  0.0f), glm::vec2(0.0f, 0.0f)},
+		Vertex{glm::vec3(0.0f, 1.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
+		Vertex{glm::vec3(0.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+		Vertex{glm::vec3(0.0f, 0.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
 		//Right
-		VE{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(1.0f, 0.0f,  0.0f), glm::vec2(1.0f, 0.0f)},
+		Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
+		Vertex{glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+		Vertex{glm::vec3(1.0f, 1.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+		Vertex{glm::vec3(1.0f, 0.0f,  0.0f), glm::vec2(1.0f, 0.0f)},
 		//Bottom
-		VE{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
-		VE{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
-		VE{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
-		VE{glm::vec3(0.0f, 0.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
+		Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec2(0.0f, 0.0f)},
+		Vertex{glm::vec3(1.0f, 0.0f, 0.0f), glm::vec2(0.0f, 1.0f)},
+		Vertex{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec2(1.0f, 1.0f)},
+		Vertex{glm::vec3(0.0f, 0.0f,  1.0f), glm::vec2(1.0f, 0.0f)},
 	};
 
 	GLuint referenceIndex[36] = {
@@ -290,7 +216,7 @@ Out Chunk::GenerateVertices(int chunkX, int chunkZ)
 		glm::vec2(1.0f, 0.0f),
 	};
 
-	std::vector<VE> tempV;
+	std::vector<Vertex> tempV;
 	std::vector<GLuint> tempI;
 	for (int x = 0; x < CHUNK_WIDTH; x++)
 	{
@@ -298,7 +224,7 @@ Out Chunk::GenerateVertices(int chunkX, int chunkZ)
 		{
 			for (int z = 0; z < CHUNK_WIDTH; z++)
 			{
-				int block = Chunk::blocks[COORD_INDEX(x, y, z)];
+				char block = Chunk::blocks[COORD_INDEX(x, y, z)];
 				if (block != 0)
 				{
 					//Add vertex
@@ -308,7 +234,7 @@ Out Chunk::GenerateVertices(int chunkX, int chunkZ)
 					for (int i = 0; i < 24; i++)
 					{
 						//tempV.push_back(VE{ position + referenceVertex[i].position, uv(referenceVertex[i].texUV, block) });
-						tempV.push_back(VE{ position + referenceVertex[i].position, uvSet[i] });
+						tempV.push_back(Vertex{ position + referenceVertex[i].position, uvSet[i] });
 						
 					}
 					int offset = tempV.size() - 24;
@@ -377,7 +303,7 @@ Out Chunk::GenerateVertices(int chunkX, int chunkZ)
 		}
 	}
 
-	return Out{ tempV, tempI };
+	return ChunkGraphics{ tempV, tempI };
 }
 const int Chunk::COORD_INDEX(int localX, int localY, int localZ)
 {

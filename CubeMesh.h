@@ -11,18 +11,23 @@
 
 class CubeMesh
 {
-public:
-	std::vector<VE> vertices;
-	std::vector<GLuint> indices;
-	Texture texture;
+	public:
+		VAO VAO;
+		Chunk chunk;
 
-	VAO VAO;
-	Chunk chunk;
+		CubeMesh(Texture& texture, int chunkX, int chunkZ);
 
-	CubeMesh(Texture& texture, int x, int z);
-	CubeMesh();
-	void GenerateVertices();
-	void Draw(Shader& shader, Camera& camera);
+		void Load();
+
+		void Draw(Shader& shader, Camera& camera);
+
+		bool loaded = false;
+		int chunkX;
+		int chunkZ;
+	private:
+		std::vector<Vertex> vertices;
+		std::vector<GLuint> indices;
+		Texture texture;
 };
 
 #endif

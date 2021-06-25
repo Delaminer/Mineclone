@@ -138,4 +138,72 @@ class Perlin
             return total / frequency;
         }
 };
+
+
+void PerlinNoise1D(int count, float* seed, int octaves, float* output)
+{
+    for (int x = 0; x < count; x++)
+    {
+        float noise = 0.0f;
+        float scale = 1.0f;
+        float scaleAccumulate = 0.0f; //What the total scale is after all octaves
+        float scaleBias = 1.0f;
+
+        for (int octave = 0; octave < octaves; octave++)
+        {
+            int pitch = count >> octave; //Halve pitch for each octave
+            int sample1 = (x / pitch) * pitch; //Removes remainder
+            int sample2 = (sample1 + pitch) % count; //Other sample
+
+            float blend = (float)(x - sample1) / (float)pitch; //From 0 to 1
+            float sample = (1.0f - blend) * seed[sample1] + blend * seed[sample2];
+            noise += sample * scale;
+
+            scaleAccumulate += scale;
+            scale = scale / scaleBias; //Halve the scale each octave
+
+        }
+
+        output[x] = noise / scaleAccumulate;
+    }
+}
+
+void PerlinNoise2D(int width, int height, float* seed, int octaves, float* output)
+{
+    for (int x = 0; x < width; x++)
+    {
+        for (int y = 0; y < height; y++)
+        {
+            float noise = 0.0f;
+            float scale = 1.0f;
+            float scaleAccumulate = 0.0f; //What the total scale is after all octaves
+            float scaleBias = 1.75f;
+
+            for (int octave = 0; octave < octaves; octave++)
+            {
+                int pitch = width >> octave; //Halve pitch for each octave
+
+                int sampleX1 = (x / pitch) * pitch; //Removes remainder
+                int sampleY1 = (y / pitch) * pitch; //Removes remainder
+
+                int sampleX2 = (sampleX1 + pitch) % width; //Other sample
+                int sampleY2 = (sampleY1 + pitch) % width; //Other sample
+
+                float blendX = (float)(x - sampleX1) / (float)pitch; //From 0 to 1
+                float blendY = (float)(y - sampleY1) / (float)pitch; //From 0 to 1
+
+                float sampleT = (1.0f - blendX) * seed[sampleY1 * width + sampleX1] + blendX * seed[sampleY1 * width + sampleX2];
+                float sampleB = (1.0f - blendX) * seed[sampleY2 * width + sampleX1] + blendX * seed[sampleY2 * width + sampleX2];
+
+                noise += (blendY * (sampleB - sampleT) + sampleT) * scale;
+
+                scaleAccumulate += scale;
+                scale = scale / scaleBias; //Halve the scale each octave
+
+            }
+
+            output[y * width + x] = noise / scaleAccumulate;
+        }
+    }
+}
 */

@@ -9,15 +9,22 @@
 class World
 {
 	public:
+		const int RENDER_DISTANCE = 5;
 
-		Texture texture;
-
-		std::map<int, std::map<int, CubeMesh>> chunks;
-		std::vector<CubeMesh> achunks;
-		//std::map<int, CubeMesh> chunks;
+		std::map<int, std::map<int, CubeMesh*>> chunks;
 		World(Texture& texture);
 		void AddChunk(int x, int z);
 		void Draw(Shader& shader, Camera& camera);
+		void CheckForChunks(glm::vec3 position);
+		void SetPosition(glm::vec3 position);
+		void Job();
+
+	private:
+
+		Texture texture;
+		int chunkX;
+		int chunkZ;
+		std::vector<CubeMesh*> toLoad;
 };
 
 #endif

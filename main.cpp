@@ -5,12 +5,12 @@
 const unsigned int width = 800;
 const unsigned int height = 800;
 
-Vertex plane_vertices[] =
+ComplexVertex plane_vertices[] =
 {
-	Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
-	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
-	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)}
+	ComplexVertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+	ComplexVertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+	ComplexVertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+	ComplexVertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)}
 };
 
 GLuint plane_indices[] =
@@ -21,14 +21,14 @@ GLuint plane_indices[] =
 
 Vertex lightVertices[] =
 {
-	Vertex{glm::vec3(-0.1f, -0.1f,  0.1f)},
-	Vertex{glm::vec3(-0.1f, -0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f, -0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f, -0.1f,  0.1f)},
-	Vertex{glm::vec3(-0.1f,  0.1f,  0.1f)},
-	Vertex{glm::vec3(-0.1f,  0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f,  0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f,  0.1f,  0.1f)}
+	Vertex{glm::vec3(-0.1f, -0.1f,  0.1f), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(-0.1f, -0.1f, -0.1f), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(0.1f, -0.1f, -0.1f), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(0.1f, -0.1f,  0.1f), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(-0.1f,  0.1f,  0.1f), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(-0.1f,  0.1f, -0.1f), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(0.1f,  0.1f, -0.1f), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(0.1f,  0.1f,  0.1f), glm::vec2(0.0f, 0.0f)}
 };
 
 GLuint lightIndices[] =
@@ -83,7 +83,7 @@ int main()
 
 	Shader shaderProgram("defaultSimple.vert", "defaultSimple.frag");
 
-	std::vector<Vertex> verts(plane_vertices, plane_vertices + sizeof(plane_vertices) / sizeof(Vertex));
+	std::vector<ComplexVertex> verts(plane_vertices, plane_vertices + sizeof(plane_vertices) / sizeof(ComplexVertex));
 	std::vector<GLuint> ind(plane_indices, plane_indices + sizeof(plane_indices) / sizeof(GLuint));
 	std::vector<Texture> tex(textures, textures + sizeof(textures) / sizeof(Texture));
 	//Mesh floor(verts, ind, tex);
@@ -97,14 +97,6 @@ int main()
 
 	Texture s("Assets/blocks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE);
 	World world(s);
-	//world.AddChunk(0, 0);
-	for (int x = 0; x < 10; x++)
-	{
-		for (int z = 0; z < 10; z++)
-		{
-			world.AddChunk(x, z);
-		}
-	}
 
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -133,6 +125,7 @@ int main()
 	glFrontFace(GL_CCW);
 
 	Camera camera(width, height, glm::vec3(Chunk::CHUNK_WIDTH / 2, Chunk::CHUNK_HEIGHT, Chunk::CHUNK_WIDTH / 2));
+	world.SetPosition(camera.Position);
 
 	//Timing stuff to display FPS
 	double prevTime = 0.0;
@@ -164,6 +157,9 @@ int main()
 
 		camera.Inputs(window);
 		camera.updateMatrix(45.0f, 0.1f, 100.0f);
+
+		world.CheckForChunks(camera.Position);
+		world.Job();
 
 		//floor.Draw(shaderProgram, camera);
 		//light.Draw(lightShader, camera);

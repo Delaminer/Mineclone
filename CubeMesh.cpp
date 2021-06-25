@@ -1,30 +1,42 @@
 #include"CubeMesh.h"
 #include<iostream>
-CubeMesh::CubeMesh(Texture& texture, int x, int z) : chunk(x, z), texture(texture)
+
+CubeMesh::CubeMesh(Texture& texture, int x, int z) : chunk(), texture(texture)
 {
 	CubeMesh::texture = texture;
+	CubeMesh::chunkX = x;
+	CubeMesh::chunkZ = z;
 
-	Out o = chunk.GenerateVertices(x, z);
-	CubeMesh::vertices = o.vertices;
-	CubeMesh::indices = o.indices;
-	
+	loaded = false;
+}
+
+void CubeMesh::Load()
+{
+	chunk.GenerateBlocks(chunkX, chunkZ);
+
+	ChunkGraphics gfx = chunk.GenerateVertices(chunkX, chunkZ);
+	CubeMesh::vertices = gfx.vertices;
+	CubeMesh::indices = gfx.indices;
+
 	VAO.Bind();
 
 	VBO VBO(vertices);
 
 	EBO EBO(indices);
-	
-	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(VE), (void*)0);
-	VAO.LinkAttrib(VBO, 1, 2, GL_FLOAT, sizeof(VE), (void*)(3 * sizeof(float)));
+
+	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	VAO.LinkAttrib(VBO, 1, 2, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
 
 	VAO.Unbind();
 	VBO.Unbind();
 	EBO.Unbind();
 
+	loaded = true;
 }
 
 void CubeMesh::Draw(Shader& shader, Camera& camera)
 {
+	if (!loaded) return;
 
 	shader.Activate();
 	VAO.Bind();

@@ -5,7 +5,7 @@
 #include<glad/glad.h>
 #include<vector>
 
-struct Vertex
+struct ComplexVertex
 {
 	glm::vec3 position;
 	glm::vec3 normal;
@@ -13,7 +13,7 @@ struct Vertex
 	glm::vec2 texUV;
 };
 
-struct VE
+struct Vertex
 {
 	glm::vec3 position;
 	glm::vec2 texUV;
@@ -24,7 +24,7 @@ class VBO
 	public:
 		GLuint ID;
 		//VBO(std::vector<Vertex>& vertices);
-		VBO(std::vector<VE>& vertices);
+		VBO(std::vector<Vertex>& vertices);
 
 		void Bind();
 		void Unbind();
