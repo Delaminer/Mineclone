@@ -1,5 +1,6 @@
 #include"Mesh.h"
 #include"CubeMesh.h"
+#include"World.h"
 
 const unsigned int width = 800;
 const unsigned int height = 800;
@@ -95,7 +96,15 @@ int main()
 	Shader blockShader("block.vert", "block.frag");
 
 	Texture s("Assets/blocks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE);
-	CubeMesh world(s);
+	World world(s);
+	//world.AddChunk(0, 0);
+	for (int x = 0; x < 10; x++)
+	{
+		for (int z = 0; z < 10; z++)
+		{
+			world.AddChunk(x, z);
+		}
+	}
 
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 

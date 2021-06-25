@@ -2,6 +2,7 @@
 #include"Chunk.h"
 #include <stdlib.h>
 #include <time.h>
+#include"Perlin.h"
 
 
 void PerlinNoise1D(int count, float* seed, int octaves, float* output)
@@ -41,7 +42,7 @@ void PerlinNoise2D(int width, int height, float* seed, int octaves, float* outpu
 			float noise = 0.0f;
 			float scale = 1.0f;
 			float scaleAccumulate = 0.0f; //What the total scale is after all octaves
-			float scaleBias = 1.2f;
+			float scaleBias = 1.75f;
 
 			for (int octave = 0; octave < octaves; octave++)
 			{
@@ -70,31 +71,33 @@ void PerlinNoise2D(int width, int height, float* seed, int octaves, float* outpu
 		}
 	}
 }
-Chunk::Chunk(int x, int y)
+
+
+Chunk::Chunk(int chunkX, int chunkZ)
 {
-	//blocks = {
-	//	2, 4, 5, 6, 7, 83, 3, 3, 3
-	//};
-	//Chunk::blocks[CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT];
-
-
+	/* Old Perlin Noise
 	float *noiseSeed = new float[CHUNK_WIDTH * CHUNK_WIDTH];
 	float *perlinNoise = new float[CHUNK_WIDTH * CHUNK_WIDTH];
-	srand(time(NULL));
+	//srand(time(NULL));
+	unsigned int seed = 1;
+	srand(chunkX + seed);
+	srand(chunkZ + rand());
 	for (int i = 0; i < CHUNK_WIDTH * CHUNK_WIDTH; i++) noiseSeed[i] = (float)rand() / (float)RAND_MAX;
 
-	int octaves = 6;
+	int octaves = 4;
 	PerlinNoise2D(CHUNK_WIDTH, CHUNK_WIDTH, noiseSeed, octaves, perlinNoise);
+	*/
+
 	//Generate blocks
 	for (int x = 0; x < CHUNK_WIDTH; x++)
 	{
 		for (int z = 0; z < CHUNK_WIDTH; z++)
 		{
-			//int height = rand() % 5 + 1;
-			int height = (int)(CHUNK_HEIGHT * perlinNoise[x * CHUNK_WIDTH + z]);
+			//int height = (int)(CHUNK_HEIGHT * perlinNoise[x * CHUNK_WIDTH + z]);
+			int scale = 10;
+			int height = 4 + (int)(CHUNK_HEIGHT * perlin.ValueNoise_2D((chunkX * CHUNK_WIDTH + x) * scale, (chunkZ * CHUNK_WIDTH + z) * scale));
 			for (int y = 0; y < CHUNK_HEIGHT; y++)
 			{
-
 				if (y == 0)
 				{
 					Chunk::blocks[COORD_INDEX(x, y, z)] = 4; //stone
@@ -111,7 +114,6 @@ Chunk::Chunk(int x, int y)
 				{
 					Chunk::blocks[COORD_INDEX(x, y, z)] = 0;
 				}
-				//blocks[3] = 3;
 			}
 		}
 	}
@@ -212,7 +214,7 @@ void generateUvSet(int id, glm::vec2* uvSet, glm::vec2* reference)
 	}
 }
 
-Out Chunk::GenerateVertices()
+Out Chunk::GenerateVertices(int chunkX, int chunkZ)
 {
 	VE referenceVertex[24] = {
 
@@ -273,6 +275,12 @@ Out Chunk::GenerateVertices()
 		20, 21, 22,
 		20, 22, 23,
 	};
+
+	glm::vec3 chunkOffset = glm::vec3(chunkX * CHUNK_WIDTH, 0, chunkZ * CHUNK_WIDTH);
+	for (int i = 0; i < 24; i++)
+	{
+		referenceVertex[i].position = referenceVertex[i].position + chunkOffset;
+	}
 
 	glm::vec2 simpleUV[4] =
 	{

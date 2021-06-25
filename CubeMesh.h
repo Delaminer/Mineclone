@@ -19,8 +19,8 @@ public:
 	VAO VAO;
 	Chunk chunk;
 
-	CubeMesh(Texture& texture);
-
+	CubeMesh(Texture& texture, int x, int z);
+	CubeMesh();
 	void GenerateVertices();
 	void Draw(Shader& shader, Camera& camera);
 };
