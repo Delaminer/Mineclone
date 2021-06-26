@@ -1,6 +1,6 @@
 #include"Camera.h"
 
-Camera::Camera(int width, int height, glm::vec3 position)
+Camera::Camera(int width, int height, glm::vec3 position) : Rigidbody(position)
 {
 	Camera::width = width;
 	Camera::height = height;
@@ -23,7 +23,7 @@ void Camera::Matrix(Shader& shader, const char* uniform)
 	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(cameraMatrx));
 }
 
-void Camera::Inputs(GLFWwindow* window)
+void Camera::Inputs(GLFWwindow* window, int groundLevel, float dt)
 {
 	glm::vec3 movement = glm::vec3(0.0f, 0.0f, 0.0f);
 	//Four directions WASD
@@ -52,11 +52,15 @@ void Camera::Inputs(GLFWwindow* window)
 	//Vertical movement
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
-		Position += speed * Up;
+		//Position += speed * Up;
+		if (ground) {
+			ground = false;
+			Velocity.y = 5.0f;
+		}
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 	{
-		Position += speed * -Up;
+		//Position += speed * -Up;
 	}
 	//Sprinting
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
@@ -67,6 +71,8 @@ void Camera::Inputs(GLFWwindow* window)
 	{
 		speed = 0.1f;
 	}
+
+	Process(dt, groundLevel);
 
 	//Mouse movement
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)

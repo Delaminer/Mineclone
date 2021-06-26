@@ -2,14 +2,25 @@
 #include"Chunk.h"
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 #include"Perlin.h"
 
 
+float map(float x, float in_min, float in_max, float out_min, float out_max) {
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 
 Chunk::Chunk()
 {
 
+}
+
+int getHeightLevel(int x, int z)
+{
+	float t = (1.0f * x + z) / 20.0f;
+	float s = sin(t);
+	return s * 6 + 12;
 }
 
 void Chunk::GenerateBlocks(int chunkX, int chunkZ)
@@ -21,8 +32,10 @@ void Chunk::GenerateBlocks(int chunkX, int chunkZ)
 		{
 			//int height = (int)(CHUNK_HEIGHT * perlinNoise[x * CHUNK_WIDTH + z]);
 			int scale = 10;
-			int height = 4 + (int)(CHUNK_HEIGHT * perlin.ValueNoise_2D((chunkX * CHUNK_WIDTH + x) * scale, (chunkZ * CHUNK_WIDTH + z) * scale));
-			for (int y = 0; y < CHUNK_HEIGHT; y++)
+			//int height = 4 + (int)(CHUNK_HEIGHT * perlin.ValueNoise_2D((chunkX * CHUNK_WIDTH + x) * scale, (chunkZ * CHUNK_WIDTH + z) * scale));
+			//int height = getHeightLevel(chunkX * CHUNK_WIDTH + x, chunkZ * CHUNK_WIDTH + z);
+			int height = (int)map(perlin.ValueNoise_2D((chunkX * CHUNK_WIDTH + x) * scale, (chunkZ * CHUNK_WIDTH + z) * scale), -0.28f, 0.35f, 4, 9);
+			for (int y = 0; y <= height; y++)
 			{
 				if (y == 0)
 				{
@@ -45,9 +58,6 @@ void Chunk::GenerateBlocks(int chunkX, int chunkZ)
 	}
 }
 
-float map(float x, float in_min, float in_max, float out_min, float out_max) {
-	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-}
 
 glm::vec2 uv(glm::vec2 inUV, int x, int y)
 {
@@ -312,4 +322,14 @@ const int Chunk::COORD_INDEX(int localX, int localY, int localZ)
 bool Chunk::isABlock(int x, int y, int z)
 {
 	return blocks[COORD_INDEX(x, y, z)] != 0;
+}
+int Chunk::GetHeight(int x, int z)
+{
+	for (int y = CHUNK_HEIGHT - 1; y >= 0; y--)
+	{
+		if (isABlock(x, y, z)) {
+			return y;
+		}
+	}
+	return -2;
 }

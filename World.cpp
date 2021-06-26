@@ -112,3 +112,14 @@ void World::Job()
 		toLoad.pop_back();
 	}
 }
+
+int World::GetHeight(int x, int z)
+{
+	if (chunks.count(x/Chunk::CHUNK_WIDTH) > 0 && chunks[x/ Chunk::CHUNK_WIDTH].count(z / Chunk::CHUNK_WIDTH) > 0)
+		return chunks[x / Chunk::CHUNK_WIDTH][z / Chunk::CHUNK_WIDTH]->chunk.GetHeight(x % Chunk::CHUNK_WIDTH, z % Chunk::CHUNK_HEIGHT);
+	return -1;
+}
+int World::GetHeight(glm::vec3 position)
+{
+	return GetHeight(position.x, position.z);
+}

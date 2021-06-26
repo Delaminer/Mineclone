@@ -95,8 +95,8 @@ int main()
 
 	Shader blockShader("block.vert", "block.frag");
 
-	Texture s("Assets/blocks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE);
-	World world(s);
+	Texture textureAtlas("Assets/blocks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE);
+	World world(textureAtlas);
 
 	glm::vec4 lightColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -124,7 +124,26 @@ int main()
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 
-	Camera camera(width, height, glm::vec3(Chunk::CHUNK_WIDTH / 2, Chunk::CHUNK_HEIGHT, Chunk::CHUNK_WIDTH / 2));
+	Perlin perlin;
+	float sum = 0.0f;
+	int count = 0;
+	float mini = 0.0f;
+	float maxi = 0.0f;
+	for (int x = -9999; x < 9999; x += 1000)
+	{
+		for (int z = -9999; z < 9999; z += 1000)
+		{
+			float val = perlin.ValueNoise_2D(x, z);
+			sum += val;
+			count++;
+			if (val > maxi) maxi = val;
+			if (val < mini) mini = val;
+		}
+	}
+	float avg = sum / count;
+	std::cout << count << " f = " << sum << " r(" << mini << ", " << maxi << ") avg= " << avg << std::endl;
+
+	Camera camera(width, height, glm::vec3(Chunk::CHUNK_WIDTH / 2, Chunk::CHUNK_HEIGHT + 1, Chunk::CHUNK_WIDTH / 2));
 	world.SetPosition(camera.Position);
 
 	//Timing stuff to display FPS
@@ -155,10 +174,12 @@ int main()
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		camera.Inputs(window);
+
+		//world.GetHeight(camera.Position)
+		camera.Inputs(window, world.GetHeight(camera.Position), timeDiff);
 		camera.updateMatrix(45.0f, 0.1f, 100.0f);
 
-		world.CheckForChunks(camera.Position);
+		//world.CheckForChunks(camera.Position);
 		world.Job();
 
 		//floor.Draw(shaderProgram, camera);
