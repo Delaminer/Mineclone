@@ -53,14 +53,15 @@ void Camera::Inputs(GLFWwindow* window, int groundLevel, float dt)
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		//Position += speed * Up;
-		if (ground) {
+		/*if (ground) {
 			ground = false;
 			Velocity.y = 5.0f;
-		}
+		}*/
+		Position += speed * Up;
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
 	{
-		//Position += speed * -Up;
+		Position += speed * -Up;
 	}
 	//Sprinting
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
@@ -72,7 +73,7 @@ void Camera::Inputs(GLFWwindow* window, int groundLevel, float dt)
 		speed = 0.1f;
 	}
 
-	Process(dt, groundLevel);
+	//Process(dt, groundLevel);
 
 	//Mouse movement
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)

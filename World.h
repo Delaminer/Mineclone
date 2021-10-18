@@ -6,6 +6,7 @@
 #include <vector>
 #include"Texture.h"
 #include"CubeMesh.h"
+#include"Rigidbody.h"
 
 class World
 {
@@ -22,6 +23,8 @@ class World
 
 		int GetHeight(int x, int z);
 		int GetHeight(glm::vec3);
+
+		void Manage(Rigidbody& rb, float dt);
 
 	private:
 

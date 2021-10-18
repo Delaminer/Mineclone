@@ -16,7 +16,7 @@ class Chunk
 		static const unsigned char TEXTURE_ATLAS_WIDTH = 4;
 		static const unsigned char CHUNK_WIDTH = 16;
 		static const unsigned char CHUNK_HEIGHT = 32;
-		static const bool DRAW_ALL_FACES = false;
+		static const bool DRAW_ALL_FACES = true;
 
 		char blocks[CHUNK_WIDTH * CHUNK_WIDTH * CHUNK_HEIGHT];
 		Chunk();

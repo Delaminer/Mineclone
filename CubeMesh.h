@@ -1,8 +1,6 @@
 #ifndef CUBE_MESH_CLASS_H
 #define CUBE_MESH_CLASS_H
 
-#include<string>
-
 #include"VAO.h"
 #include"EBO.h"
 #include"Camera.h"

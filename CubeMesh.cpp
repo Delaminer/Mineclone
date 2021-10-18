@@ -1,5 +1,4 @@
 #include"CubeMesh.h"
-#include<iostream>
 
 CubeMesh::CubeMesh(Texture& texture, int x, int z) : chunk(), texture(texture)
 {

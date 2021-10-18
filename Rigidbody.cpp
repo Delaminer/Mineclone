@@ -17,4 +17,5 @@ void Rigidbody::Process(float dt, float groundLevel)
 		Position.y = groundLevel + offset;
 		ground = true;
 	}
+	Position.y = 10;
 }

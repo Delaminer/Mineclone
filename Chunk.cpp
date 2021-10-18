@@ -35,6 +35,7 @@ void Chunk::GenerateBlocks(int chunkX, int chunkZ)
 			//int height = 4 + (int)(CHUNK_HEIGHT * perlin.ValueNoise_2D((chunkX * CHUNK_WIDTH + x) * scale, (chunkZ * CHUNK_WIDTH + z) * scale));
 			//int height = getHeightLevel(chunkX * CHUNK_WIDTH + x, chunkZ * CHUNK_WIDTH + z);
 			int height = (int)map(perlin.ValueNoise_2D((chunkX * CHUNK_WIDTH + x) * scale, (chunkZ * CHUNK_WIDTH + z) * scale), -0.28f, 0.35f, 4, 9);
+
 			for (int y = 0; y <= height; y++)
 			{
 				if (y == 0)

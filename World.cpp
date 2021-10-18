@@ -123,3 +123,22 @@ int World::GetHeight(glm::vec3 position)
 {
 	return GetHeight(position.x, position.z);
 }
+
+void World::Manage(Rigidbody& rb, float dt)
+{
+	//The player just gave an input, and it probably moved them into a block. Correct this.
+	glm::vec3 position = rb.Position;
+	int groundLevel = GetHeight(rb.Position);
+	//y = 1 sits on block=0
+
+	rb.Velocity += rb.GRAVITY * dt;
+	rb.Position += rb.Velocity * dt;
+	//float offset = 2.0f;
+	std::cout << groundLevel << std::endl;
+	if (rb.Position.y < groundLevel)
+	{
+		rb.Velocity.y = 0.0f;
+		rb.Position.y = groundLevel;
+		rb.ground = true;
+	}
+}

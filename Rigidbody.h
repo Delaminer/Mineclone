@@ -17,6 +17,9 @@ class Rigidbody
 		glm::vec3 Velocity;
 		bool ground = true;
 
+		float colliderHeight;
+		float colliderWidth;
+
 		Rigidbody(glm::vec3 pos);
 		void Process(float dt, float groundLevel);
 

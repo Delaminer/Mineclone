@@ -143,7 +143,9 @@ int main()
 	float avg = sum / count;
 	std::cout << count << " f = " << sum << " r(" << mini << ", " << maxi << ") avg= " << avg << std::endl;
 
-	Camera camera(width, height, glm::vec3(Chunk::CHUNK_WIDTH / 2, Chunk::CHUNK_HEIGHT + 1, Chunk::CHUNK_WIDTH / 2));
+	glm::vec3 position = glm::vec3(0.5f, 0.0f, 0.5f);
+	//glm::vec3 position = glm::vec3(Chunk::CHUNK_WIDTH / 2, Chunk::CHUNK_HEIGHT + 1, Chunk::CHUNK_WIDTH / 2);
+	Camera camera(width, height, position);
 	world.SetPosition(camera.Position);
 
 	//Timing stuff to display FPS
@@ -152,7 +154,7 @@ int main()
 	double timeDiff;
 	unsigned int counter = 0;
 
-	//Disable VSync (not necessary)
+	//This disables VSync, uncomment it to get max frames
 	//glfwSwapInterval(0);
 
 	//While the window is meant to be open, loop through this
@@ -176,7 +178,8 @@ int main()
 
 
 		//world.GetHeight(camera.Position)
-		camera.Inputs(window, world.GetHeight(camera.Position), timeDiff);
+		camera.Inputs(window, 1, timeDiff);
+		world.Manage(camera, timeDiff);
 		camera.updateMatrix(45.0f, 0.1f, 100.0f);
 
 		//world.CheckForChunks(camera.Position);
