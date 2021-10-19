@@ -7,8 +7,8 @@ A clone of Minecraft to learn OpenGL and C++.
 
 Some images:
 
-![Ground 1](https://github.com/Delaminer/Mineclone/blob/master/Images/Ground%201.png)
-
 ![Ground 2](https://github.com/Delaminer/Mineclone/blob/master/Images/Ground%202.png)
 
 ![Side View](https://github.com/Delaminer/Mineclone/blob/master/Images/Side%20View.png)
+
+![Ground 1](https://github.com/Delaminer/Mineclone/blob/master/Images/Ground%201.png)
